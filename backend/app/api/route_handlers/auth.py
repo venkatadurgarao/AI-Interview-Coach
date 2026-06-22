@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse, JSONResponse
 from app.models.PydanticSchema import Login as LoginSchema, Register as RegisterSchema, JWT_Type as JWT_TypeSchema
 import bcrypt
 import sqlite3
-from app.utils.jwt_helpers import get_token, verify_token
+from app.utils.jwt_helpers import get_token, decode_token
 from app.utils.sqlite_cursor import get_cursor
 
 def login(data: LoginSchema, request: Request):
@@ -18,14 +18,14 @@ def login(data: LoginSchema, request: Request):
             raise HTTPException(detail="Connection not created", status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         con, cursor = db_connection
-        print(data.user_email)
+        # print(data.user_email)
         
         user_info = cursor.execute("SELECT * FROM users WHERE user_email = ?", (data.user_email,)).fetchone()
         
         if not user_info:
             raise HTTPException(detail="Invalid Credentials", status_code=status.HTTP_401_UNAUTHORIZED)
         
-        print(user_info)
+        # print(user_info)
         
         compare = bcrypt.checkpw(data.user_pass.encode("utf-8"), user_info['user_pass'])
         if not compare:
@@ -47,10 +47,11 @@ def login(data: LoginSchema, request: Request):
         response.set_cookie(
             key="jwt_token",
             value=token,
-            secure=True,
+            secure=False,
             samesite="lax",
-            max_age=900,
-            httponly=True
+            max_age=1800,
+            httponly=True,
+            path="/",
         )
         
         return response
@@ -94,3 +95,31 @@ def register(data: RegisterSchema, request: Request):
     except Exception as e:
         print(f"Error : \n{e}")
         return {"message" : "Failed to process your request", "error": str(e)}
+
+def verify_token(req: Request):
+    try: 
+        
+        jwt_token = req.cookies.get("jwt_token")
+        # print("Token FROM FRONTEND: ", jwt_token)
+        if not jwt_token:
+            # print("No Token")
+            return JSONResponse(
+                content={"message" : "Token not found"},
+                status_code=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        decoded_token:JWT_TypeSchema = decode_token(jwt_token)
+        # print(decoded_token.get('data').get('user_email'))
+        
+            
+        return JSONResponse(
+            content={"message" : "Token Valid", "user_email" : decoded_token.get('data').get('user_email')},
+            status_code=200
+        )
+    except Exception as e:
+        print("Invalid Token", str(e))
+        
+        return JSONResponse(
+            content={"message" : "Invalid Token", "error": str(e)},
+            status_code=status.HTTP_401_UNAUTHORIZED
+        )

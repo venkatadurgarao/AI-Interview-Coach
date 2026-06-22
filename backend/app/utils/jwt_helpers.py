@@ -18,7 +18,7 @@ def get_token(data: any):
     
     print({
         "iat"  : datetime.now(timezone.utc).ctime(),
-        "exp"  : (datetime.now(timezone.utc) + timedelta(minutes=2)).ctime()
+        "exp"  : (datetime.now(timezone.utc) + timedelta(minutes=15)).ctime()
     })
     
     # print(payload)
@@ -28,12 +28,12 @@ def get_token(data: any):
     return token
 
 
-def verify_token(token):
+def decode_token(token):
     try:
         print(JWT_SECRET_KEY)
         print(JWT_ALGORITHM)
         decoded_payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-        print(f"Token from verify_token: {decoded_payload}")
+        print(f"Token from decode_token: {decoded_payload}")
 
         return decoded_payload
     except jwt.ExpiredSignatureError:

@@ -71,3 +71,62 @@ export default defineConfig([
   },
 ])
 ```
+
+
+src/
+│
+├── assets/
+│   ├── images/
+│   └── icons/
+│
+├── components/
+│   ├── common/
+│   │   ├── Button.tsx
+│   │   ├── Input.tsx
+│   │   └── Loader.tsx
+│   │
+│   └── layout/
+│       ├── Sidebar.tsx
+│       ├── Navbar.tsx
+│       └── Footer.tsx
+│
+├── layouts/
+│   ├── AuthLayout.tsx
+│   └── DashboardLayout.tsx
+│
+├── pages/
+│   ├── auth/
+│   │   ├── Login.tsx
+│   │   └── Register.tsx
+│   │
+│   ├── dashboard/
+│   │   ├── Dashboard.tsx
+│   │   ├── Users.tsx
+│   │   ├── Reports.tsx
+│   │   └── Settings.tsx
+│   │
+│   └── NotFound.tsx
+│
+├── routes/
+│   ├── AppRoutes.tsx
+│   └── ProtectedRoute.tsx
+│
+├── services/
+│   ├── api.ts
+│   └── authService.ts
+│
+├── hooks/
+│   └── useAuth.ts
+│
+├── context/
+│   └── AuthContext.tsx
+│
+├── types/
+│   └── auth.types.ts
+│
+├── utils/
+│   └── constants.ts
+│
+├── App.tsx
+├── main.tsx
+└── index.css
