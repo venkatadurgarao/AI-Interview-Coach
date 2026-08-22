@@ -1,0 +1,177 @@
+import React, { useEffect, useState } from "react";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import type { LoginCredentialErrorType, LoginCredentialType, RegisterUserType } from "../../types/auth.types";
+import { apis } from "../../api/api";
+import { success, failed } from '../../redux/state/loginSlice'
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router";
+import axios from "axios";
+import { TailSpin } from "react-loader-spinner";
+import { addSnackbar } from "../../redux/state/snackbarSlice";
+import { nanoid } from "@reduxjs/toolkit";
+
+
+export default function Register() {
+    const initialState = { user_email: "", user_fname: "", user_lname: "", user_pass: "", confirm_pass: "" };
+    const [data, setData] = useState<RegisterUserType>(initialState);
+    const [error, setError] = useState<LoginCredentialErrorType>();
+    const [showPassword, setShowPassword] = useState<{ new_pass: boolean, confirm_pass: boolean }>({ confirm_pass: false, new_pass: false });
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const PasswordIcon1 = showPassword.new_pass ? FaRegEyeSlash : FaRegEye;
+    const PasswordIcon2 = showPassword.confirm_pass ? FaRegEyeSlash : FaRegEye;
+    const validateFormData = () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        // setError((prevState) => ({ ...prevState, user_email: "" }))
+        // if (!emailRegex.test(data.user_email)) {
+        //     setError((prevState) => ({ ...prevState, user_email: "Please check entered email" }))
+        // }
+        // if (data.user_email == "") {
+        //     setError((prevState) => ({ ...prevState, user_email: "" }))
+        // }
+    }
+    useEffect(() => {
+        validateFormData()
+    }, [data]);
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const SubmitForm = async () => {
+        try {
+            setLoading(true);
+            const response = await apis.register(data);
+            // console.log(response);
+            dispatch(addSnackbar({id: nanoid(), message: response.data.message, type: 'success'}));
+            setData(initialState);
+            setLoading(false);
+            // if (response.data.login === 'success') {
+            //     // navigate("/dashboard");
+            // } else {
+
+            //     // dispatch(failed());
+            // }
+        } catch (err) {
+            console.log("Login Error : ", err);
+            if (axios.isAxiosError(err)) {
+                dispatch(addSnackbar({id: nanoid(), message: "something went wrong please try again later", type: 'error'}));
+                console.log(err.response?.status);
+                setError((prev) => ({ ...prev, login_error: "username or password are incorrect" }))
+            } else {
+                setError((prev) => ({ ...prev, login_error: "something went wrong please try again later" }))
+            }
+            setLoading(false);
+        }
+    }
+
+    return (
+        <div className="h-screen w-screen flex justify-center items-center">
+            <div className='p-3 bg-white rounded-lg w-[300px] flex flex-col gap-3'>
+                <div className="text-center text-lg">
+                    <h1>Register</h1>
+                </div>
+                <div className="flex flex-col">
+                    <input
+                        type="text"
+                        name="user_first_name"
+                        id="user_first_name"
+                        autoComplete="off"
+                        value={data.user_fname}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            setData((prev) => ({ ...prev, user_fname: e.target.value }));
+                        }}
+                        placeholder="First Name"
+                        className="border-1 border-gray-200 rounded-sm w-full outline-none px-2 py-1" />
+                    {/* <span className="text-red-500 px-3 text-[12px]">{error?.user_email}</span> */}
+                </div>
+                <div className="flex flex-col">
+                    <input
+                        type="text"
+                        name="user_last_name"
+                        id="user_last_name"
+                        autoComplete="off"
+                        value={data.user_lname}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            setData((prev) => ({...prev, user_lname: e.target.value}))
+                        }}
+                        placeholder="Last Name"
+                        className="border-1 border-gray-200 rounded-sm w-full outline-none px-2 py-1" />
+                    {/* <span className="text-red-500 px-3 text-[12px]">{error?.user_email}</span> */}
+                </div>
+                <div className="flex flex-col">
+                    <input
+                        type="text"
+                        name="user_email"
+                        id="user_email"
+                        autoComplete="off"
+                        value={data.user_email}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            setData((prev) => ({...prev, user_email: e.target.value}))
+                        }}
+                        placeholder="Email ID"
+                        className="border-1 border-gray-200 rounded-sm w-full outline-none px-2 py-1" />
+                    <span className="text-red-500 px-3 text-[12px]">{error?.user_email}</span>
+                </div>
+                <div className="flex flex-col">
+                    <div className="relative">
+                        <input
+                            type={showPassword.new_pass ? "text" : "password"}
+                            name="user_pass"
+                            id="user_pass"
+                            value={data.user_pass}
+                            onChange={
+                                (e: React.ChangeEvent<HTMLInputElement>) => {
+                                    setData((prevState) => ({ ...prevState, user_pass: e.target.value }));
+                                }
+                            }
+                            placeholder="New Password"
+                            className="border-1 border-gray-200 rounded-sm w-full outline-none px-2 py-1" />
+                        <span className="absolute top-0 right-0 h-full flex items-center pr-2" >
+                            <PasswordIcon1 className="hover:text-blue-400 hover:cursor-pointer" onClick={() => { setShowPassword((prev) => ({ ...prev, new_pass: !prev.new_pass })) }} />
+                        </span>
+                    </div>
+
+                    <span className="text-red-500 px-3 text-[12px]">{error?.user_pass}</span>
+                </div>
+                <div className="flex flex-col">
+                    <div className="relative">
+                        <input
+                            type={showPassword.confirm_pass ? "text" : "password"}
+                            name="confirm_pass"
+                            id="confirm_pass"
+                            value={data.confirm_pass}
+                            onChange={
+                                (e: React.ChangeEvent<HTMLInputElement>) => {
+                                    setData((prevState) => ({ ...prevState, confirm_pass: e.target.value }));
+                                }
+                            }
+                            placeholder="Confirm Password"
+                            className="border-1 border-gray-200 rounded-sm w-full outline-none px-2 py-1" />
+                        <span className="absolute top-0 right-0 h-full flex items-center pr-2" >
+                            <PasswordIcon2 className="hover:text-blue-400 hover:cursor-pointer" onClick={() => { setShowPassword((prev) => ({ ...prev, confirm_pass: !prev.confirm_pass })) }} />
+                        </span>
+                    </div>
+
+                    {/* <span className="text-red-500 px-3 text-[12px]">{error?.user_pass}</span> */}
+                </div>
+                {/* {error?.login_error && <span className="text-red-500 px-3 text-[12px]">{error?.login_error}</span>} */}
+                <u className="text-xs text-blue-400"><a href="/" >Already have account</a></u>
+                <div className="text-center flex justify-center">
+                    <button className="bg-blue-400 w-full rounded-sm text-white py-1" onClick={() => { SubmitForm() }} hidden={loading}>
+                        Register
+                    </button>
+                    <TailSpin
+                        visible={loading}
+                        height="30"
+                        width="30"
+                        color="#51a2ff"
+                        ariaLabel="tail-spin-loading"
+                        radius="1"
+                        strokeWidth={5}
+                        wrapperStyle={{}}
+                        wrapperClass=""
+                    />
+                </div>
+            </div>
+        </div>
+    )
+}

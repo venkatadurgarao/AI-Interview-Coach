@@ -1,6 +1,1 @@
-# Ignore all folders and files except the specified ones
-*
-!backend/
-!frontend/
-!.gitignore
-!README.md
+.interview
