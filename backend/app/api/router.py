@@ -1,42 +1,43 @@
 from fastapi import APIRouter, FastAPI, Request, HTTPException, status, Response, Depends
 from fastapi.responses import RedirectResponse, JSONResponse
-from app.models.PydanticSchema import Login as LoginSchema, Register as RegisterSchema, JWT_Type as JWT_TypeSchema
+# from app.schema.PydanticSchema import Login as LoginSchema, Register as RegisterSchema, JWT_Type as JWT_TypeSchema
 import bcrypt
 import sqlite3
 from app.utils.jwt_helpers import get_token, decode_token
 from app.utils.sqlite_cursor import get_cursor
 
-from app.api.route_handlers.auth import login, register, verify_token
-from app.api.route_handlers.private import dashboard
+# from app.api.route_handlers.auth import login, register, verify_token
+from app.api.route_handlers.private import dashboard, create_chat
 from starlette.middleware.base import BaseHTTPMiddleware
 router = APIRouter()
 auth_routes = APIRouter(prefix="/auth")
 
+# @router.post("/auth/login")
+# from app.database import get_db
 @router.get("/index/")
 def index_page():
     return {
         "message" : "Welcome to index page"
     }
     
-# @router.post("/auth/login")
 
+# auth_routes.add_api_route(
+#     path="/login",
+#     endpoint=login,
+#     methods=["POST"],
+#     # dependencies=Depends(get_db)
+# )
 
-auth_routes.add_api_route(
-    path="/login",
-    endpoint=login,
-    methods=["POST"]
-)
-
-auth_routes.add_api_route(
-    path="/register",
-    endpoint=register,
-    methods=["POST"]
-)
-auth_routes.add_api_route(
-    path="/verify-token",
-    endpoint=verify_token,
-    methods=["GET"]
-)
+# auth_routes.add_api_route(
+#     path="/register",
+#     endpoint=register,
+#     methods=["POST"]
+# )
+# auth_routes.add_api_route(
+#     path="/verify-token",
+#     endpoint=verify_token,
+#     methods=["GET"]
+# )
 async def jwt_middleware(req: Request):
     token = req.headers.get("Authorization")
     if not token:
@@ -56,8 +57,12 @@ router.add_api_route(
     dependencies=[Depends(jwt_middleware)]
 )
 
-
-
+router.add_api_route(
+    path="/chat",
+    endpoint=create_chat,
+    methods=["POST"],
+    dependencies=[Depends(jwt_middleware)]
+)
 # @router.get("/test-cookie")
 # def test_cookie(req: Request):
 #     payload = decode_token(req.cookies.get("j_token"))

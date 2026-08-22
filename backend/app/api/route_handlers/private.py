@@ -10,3 +10,10 @@ def dashboard(req: Request):
         return response
     except Exception as e: 
         pass
+
+def create_chat():
+    return JSONResponse(
+        content={"":""},
+        status_code=status.HTTP_200_OK
+    )
+
