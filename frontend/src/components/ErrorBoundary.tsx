@@ -1,7 +1,8 @@
 import React from "react";
 
 type Props = {
-    children: React.ReactNode
+    children: React.ReactNode;
+    fallback?: React.ReactNode;
 }
 type State = {
     hasError: boolean;
@@ -30,12 +31,13 @@ class ErrorBoundary extends React.Component<Props, State> {
 
     render() {
         if(this.state.hasError){
-            return (
+            
+            return (this.props.fallback ?? (
                 <div>
                     <h1>Something went wrong.</h1>
                     <p>{this.state.error?.message}</p>
                 </div>
-            )
+            ))
         }
         return this.props.children
     }

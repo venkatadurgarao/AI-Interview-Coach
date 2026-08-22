@@ -8,3 +8,51 @@ body{
 /* @tailwind base;
 @tailwind components;
 @tailwind utilities; */
+
+
+@layer components {
+    table {
+        @apply w-full
+    }
+    table td, th {
+        @apply border border-gray-400 p-2
+    }
+
+    .btn-dark {
+        @apply outline-none bg-black text-white rounded-md py-1 px-5 w-auto
+    }
+}
+
+.moving-gradient {
+  display: inline-block;
+
+  /* Sets the text base color to charcoal (#222) with a sharp white line (#fff) in the middle */
+  background: linear-gradient(
+    120deg, 
+    #222222 10%, 
+    #ffffff 30%, 
+    #222222 10%
+  );
+  
+  /* Forces the gradient setup to sit completely off-screen to the left initially */
+  background-size: 200% 100%;
+  background-position-x: 180%;
+  
+  /* Clips the moving line to the text */
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-fill-color: transparent;
+
+  /* Runs the passing line animation smoothly */
+  animation: passLine 3s linear infinite;
+}
+
+@keyframes passLine {
+  0% {
+    background-position-x: 180%;
+  }
+  100% {
+    background-position-x: -20%;
+  }
+}

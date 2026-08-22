@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit'
 import  loginSlice from './state/loginSlice'
-
+import sidebarWidthSlice from './state/sidebarWidthSlice'
+import snackbarSlice from './state/snackbarSlice'
 function loadState() {
     try{
-
         const localState = localStorage.getItem("reduxState")
         if(!localState){
             return undefined
@@ -17,7 +17,9 @@ function loadState() {
 const preloadedState = loadState();
 export const store = configureStore({
   reducer: {
-    login: loginSlice ,
+    login: loginSlice,
+    sidebar: sidebarWidthSlice,
+    snackbar: snackbarSlice
   },
 //   preloadedState: loadState()
  ...(preloadedState && { preloadedState }),
